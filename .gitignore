@@ -1,0 +1,12 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Ignore audio.wav
+audio.wav
+
+# Ignore env variables file
+.env
+
+__pycache__/
