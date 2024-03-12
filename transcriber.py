@@ -1,9 +1,8 @@
-import pyautogui
 import audiomath as am
 from openai import OpenAI
-import speech_recognition as sr
 from pynput import keyboard
 
+writer = keyboard.Controller()
 
 class AudioTranscriber:
     def __init__(self):
@@ -28,20 +27,24 @@ class AudioTranscriber:
             if self.recorder:  # hold ended
                 self.stop_recording()
                 transcription = self.transcribe_audio(open("audio.wav", "rb")).strip()
-                pyautogui.write(transcription)
+                writer.type(transcription)
                 self.recorder = None
             else:  # hold started
                 self.start_recording()
 
     def transcribe_audio(self, audio) -> str:
-        transcription = self.client.audio.transcriptions.create(
-            model="whisper-1",
-            file=audio,
-            response_format="text",
-            language="en",
-            prompt="The following is normal speech or technical speech from an engineer.",
-        )
-        return transcription
+        try:
+            transcription = self.client.audio.transcriptions.create(
+                model="whisper-1",
+                file=audio,
+                response_format="text",
+                language="en",
+                prompt="The following is normal speech or technical speech from an engineer.",
+            )
+            return transcription
+        except Exception as e:
+            print(f"Encountered Error: {e}")
+            return ""
 
     def listen_for_keypress(self):
         with keyboard.Listener(
