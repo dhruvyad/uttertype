@@ -1,12 +1,14 @@
 import audiomath as am
 from openai import OpenAI
 from pynput import keyboard
+import asyncio
 
-writer = keyboard.Controller()
 
 class AudioTranscriber:
     def __init__(self):
         self.recorder = None
+        self.event_loop = asyncio.get_event_loop()
+        self.transcriptions = asyncio.Queue()
         self.client = OpenAI()
 
     def start_recording(self):
@@ -14,20 +16,17 @@ class AudioTranscriber:
         # Start a new recording in the background, do not block
         self.recorder = am.Recorder(30, filename="audio.wav")
         self.recorder.Start()
-        print("Recording started...")
 
     def stop_recording(self):
         """Stop the recording and save to a file."""
         if self.recorder:
             self.recorder.Stop()
-            print("Recording stopped.")
 
     def fn_hold(self, key):
         if hasattr(key, "vk") and key.vk == 63:  # Adjust vk according to your keyboard
             if self.recorder:  # hold ended
                 self.stop_recording()
-                transcription = self.transcribe_audio(open("audio.wav", "rb")).strip()
-                writer.type(transcription)
+                self.transcribe_audio(open("audio.wav", "rb"))
                 self.recorder = None
             else:  # hold started
                 self.start_recording()
@@ -41,14 +40,20 @@ class AudioTranscriber:
                 language="en",
                 prompt="The following is normal speech or technical speech from an engineer.",
             )
-            return transcription
+            self.event_loop.call_soon_threadsafe(
+                self.transcriptions.put_nowait, transcription
+            )
         except Exception as e:
             print(f"Encountered Error: {e}")
             return ""
 
-    def listen_for_keypress(self):
-        with keyboard.Listener(
-            on_release=self.fn_hold,
-        ) as listener:
-            listener.join()
+    async def get_transcriptions(self):
+        while True:
+            item = await self.transcriptions.get()
+            yield item
+            self.transcriptions.task_done()
 
+    def listen_for_keypress(self):
+        keyboard.Listener(
+            on_release=self.fn_hold,
+        ).start()
