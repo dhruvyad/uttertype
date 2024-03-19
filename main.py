@@ -3,17 +3,16 @@ import asyncio
 from transcriber import AudioTranscriber
 from table_interface import ConsoleTable
 from dotenv import load_dotenv
-from pynput import keyboard
+from utils import manual_type
 
 async def main():
     load_dotenv()
     transcriber = AudioTranscriber()
     console_table = ConsoleTable()
-    keyboard_writer = keyboard.Controller()
     transcriber.listen_for_keypress()
     with console_table as table:
         async for transcription in transcriber.get_transcriptions():
-            keyboard_writer.type(transcription.strip())
+            manual_type(transcription.strip())
             console_table.insert(
                 transcription,
                 # TODO: below no longer works
