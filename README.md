@@ -26,7 +26,7 @@ If you'd like to set up a custom hotkey for triggering recording, edit the `hotk
 from key_listener import HoldHotKey
 ...
 hotkey = HoldHotKey(
-      HoldHotKey.parse("<ctrl>+<alt>+v")
+      HoldHotKey.parse("<ctrl>+<alt>+v"),
       on_activate=transcriber.start_recording,
       on_deactivate=transcriber.stop_recording,
   )
