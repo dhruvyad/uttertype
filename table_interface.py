@@ -49,6 +49,7 @@ class ConsoleTable:
             console=self.console,
             screen=False,
             refresh_per_second=5,
+            vertical_overflow="visible",
         )
         self.live_rendering.__enter__()
 

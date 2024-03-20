@@ -7,6 +7,7 @@ from pynput import keyboard
 
 keyboard_writer = keyboard.Controller()
 
+
 def clipboard_type(text):
     """
     Instead of typing each key, just copy to clipboard and paste
@@ -15,8 +16,9 @@ def clipboard_type(text):
     original_clipboard_content = pyperclip.paste()
     pyperclip.copy(text)
     print("Pasting:", text)
-    pyautogui.hotkey('command' if sys.platform == 'darwin' else 'ctrl', 'v')
+    pyautogui.hotkey("command" if sys.platform == "darwin" else "ctrl", "v")
     pyperclip.copy(original_clipboard_content)
+
 
 def manual_type(text: str, delay: float = 0.0042):
     """
@@ -32,6 +34,6 @@ def manual_type(text: str, delay: float = 0.0042):
         except (ValueError, keyboard_writer.InvalidKeyException):
             raise keyboard_writer.InvalidCharacterException(i, character)
 
+
 def transcription_concat(transcriptions: List[str]) -> str:
     return " ".join([_t.strip() for _t in transcriptions])  # Simple concat for now
-
