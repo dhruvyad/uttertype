@@ -1,0 +1,8 @@
+openai
+PyAudio
+PyAutoGUI
+pynput
+pyperclip
+python-dotenv
+rich
+webrtcvad
