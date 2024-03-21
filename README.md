@@ -1,4 +1,4 @@
-# uttertype
+# uttertype ([demo](https://www.youtube.com/watch?v=eSDYIFzU_fY))
 
 <img src="./assets/sample_terminal.png" alt="alt text" style="width: 500px;"/>
 
