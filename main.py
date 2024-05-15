@@ -1,6 +1,6 @@
 import asyncio
 from pynput import keyboard
-from transcriber import WhisperAPITranscriber
+from transcriber import WhisperAPITranscriber, WhisperLocalMLXTranscriber
 from table_interface import ConsoleTable
 from key_listener import HoldGlobeKey
 from dotenv import load_dotenv
@@ -9,7 +9,7 @@ from utils import manual_type
 
 async def main():
     load_dotenv()
-    transcriber = WhisperAPITranscriber()
+    transcriber = WhisperLocalMLXTranscriber()
     hotkey = HoldGlobeKey(
         on_activate=transcriber.start_recording,
         on_deactivate=transcriber.stop_recording,
