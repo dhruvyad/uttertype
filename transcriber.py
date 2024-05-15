@@ -1,13 +1,14 @@
+import os
 import io
 from typing import List, Tuple
 import pyaudio
 import wave
 from openai import OpenAI
-from pynput import keyboard
 import asyncio
 from threading import Thread, Event
 import webrtcvad
 from utils import transcription_concat
+import tempfile
 
 FORMAT = pyaudio.paInt16  # Audio format
 CHANNELS = 1  # Mono audio
@@ -17,6 +18,7 @@ CHUNK = int(RATE * CHUNK_DURATION_MS / 1000)
 MIN_TRANSCRIPTION_SIZE_MS = (
     1500  # Minimum duration of speech to send to API in case of silence
 )
+
 
 class AudioTranscriber:
     def __init__(self):
@@ -142,6 +144,25 @@ class WhisperAPITranscriber(AudioTranscriber):
                 language="en",
                 prompt="The following is normal speech or technical speech from an engineer.",
             )
+            return transcription
+        except Exception as e:
+            print(f"Encountered Error: {e}")
+            return ""
+
+
+class WhisperLocalMLXTranscriber(AudioTranscriber):
+    def __init__(self, model_type="distil-medium.en", *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        from lightning_whisper_mlx import LightningWhisperMLX
+
+        self.model = LightningWhisperMLX(model_type)
+
+    def transcribe_audio(self, audio: io.BytesIO) -> str:
+        try:
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmpfile:
+                tmpfile.write(audio.getvalue())
+                transcription = self.model.transcribe(tmpfile.name)["text"]
+                os.unlink(tmpfile.name)
             return transcription
         except Exception as e:
             print(f"Encountered Error: {e}")

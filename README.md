@@ -38,6 +38,31 @@ python -m pip install -r requirements.txt
 ```
 
 ### 4. Add OpenAI API key
+Make sure that your OpenAI API key is available in the terminal environment either by directly exporting it as follows
+```shell
+export OPENAI_API_KEY=<your_openai_api_key>
+```
+or creating a `.env` file in the directory with the following content
+```env
+OPENAI_API_KEY=<your_openai_api_key>
+```
+### 5. Final run and permissions
+Finally, run main.py
+```shell
+python main.py
+```
+When the program first runs, you will likely need to give it sufficient permissions. On macOS, this will include adding terminal to accessibility under `Privacy and Security > Accessibility`, giving it permission to monitor the keyboard, and finally giving it permission to record using the microphone.
+
+## Usage
+To start transcription, press and hold the registered hotkey to start recording. To stop the recording, lift your registered hotkey. On macOS, the registered hotkey is the globe icon by default. For other operating systems, this will have to by manually configured in `main.py` as described earlier.
+
+### 3. Install other dependencies
+After cloning the repository, install requirements using
+```shell
+python -m pip install -r requirements.txt
+```
+
+### 4. Add OpenAI API key
 Make sure that your OpenAI API key is available in the terminal environment either by directly exporting it as follows for macOS/Linux
 ```shell
 export OPENAI_API_KEY=<your_openai_api_key>
