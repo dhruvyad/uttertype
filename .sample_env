@@ -1,3 +1,10 @@
+# Defaults for OpenAI API:
+# OPENAI_API_KEY="sk-<your_key_here>"
+# OPENAI_BASE_URL="https://api.openai.com/v1"
+# OPENAI_MODEL_NAME="whisper-1"
+
+
+# Defaults for local faster_whisper_server:
 OPENAI_API_KEY="sk-<your_key_here>"
 OPENAI_BASE_URL="http://localhost:7000/v1"
 
