@@ -1,0 +1,8 @@
+OPENAI_API_KEY="sk-<your_key_here>"
+OPENAI_BASE_URL="http://localhost:7000/v1"
+
+OPENAI_MODEL_NAME="Systran/faster-distil-whisper-large-v3"
+# OPENAI_MODEL_NAME="deepdml/faster-whisper-large-v3-turbo-ct2"
+
+UTTERTYPE_RECORD_HOTKEYS="<ctrl>+<alt>+v"
+# UTTERTYPE_RECORD_HOTKEYS="<cmd>+<ctrl>"

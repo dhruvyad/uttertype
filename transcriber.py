@@ -131,14 +131,23 @@ class AudioTranscriber:
 
 
 class WhisperAPITranscriber(AudioTranscriber):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, base_url, model_name, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.client = OpenAI()
+
+        self.model_name = model_name
+        self.client = OpenAI(base_url=base_url)
+
+    @staticmethod
+    def create(*args, **kwargs):
+        base_url = os.getenv('OPENAI_BASE_URL', 'https://api.openai.com/v1')
+        model_name = os.getenv('OPENAI_MODEL_NAME', 'whisper-1')
+
+        return WhisperAPITranscriber(base_url, model_name)
 
     def transcribe_audio(self, audio: io.BytesIO) -> str:
         try:
             transcription = self.client.audio.transcriptions.create(
-                model="whisper-1",
+                model=self.model_name,
                 file=audio,
                 response_format="text",
                 language="en",
