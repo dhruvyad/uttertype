@@ -16,7 +16,7 @@ RATE = 16000  # Sample rate
 CHUNK_DURATION_MS = 30  # Frame duration in milliseconds
 CHUNK = int(RATE * CHUNK_DURATION_MS / 1000)
 MIN_TRANSCRIPTION_SIZE_MS = (
-    1500  # Minimum duration of speech to send to API in case of silence
+    os.getenv('UTTERTYPE_MIN_TRANSCRIPTION_SIZE_MS', 1500) # Minimum duration of speech to send to API in case of silence
 )
 
 

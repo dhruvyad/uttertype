@@ -13,3 +13,6 @@ OPENAI_MODEL_NAME="Systran/faster-distil-whisper-large-v3"
 
 UTTERTYPE_RECORD_HOTKEYS="<ctrl>+<alt>+v"
 # UTTERTYPE_RECORD_HOTKEYS="<cmd>+<ctrl>"
+
+# Minimum duration of speech to send to API in case of silence
+UTTERTYPE_MIN_TRANSCRIPTION_SIZE_MS=10000 # defaults to: 1500
