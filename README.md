@@ -50,6 +50,14 @@ This will create a virtual environment and install all dependencies from the Pip
 pipenv shell
 ```
 
+
+If during/after installation on Linux you see error similar to:
+```
+ImportError: /home/soul/anaconda3/lib/libstdc++.so.6: version `GLIBCXX_3.4.32' not found (required by /lib/x86_64-linux-gnu/libjack.so.0)
+```
+Check out [StackOverflow](https://stackoverflow.com/questions/72540359/glibcxx-3-4-30-not-found-for-librosa-in-conda-virtual-environment-after-tryin) and [Berkley](https://bcourses.berkeley.edu/courses/1478831/pages/glibcxx-missing)
+
+
 ### 4. Configure OpenAI Settings
 
 You can configure uttertype to work with either OpenAI's official API or a local Whisper server. There are two ways to set this up:
