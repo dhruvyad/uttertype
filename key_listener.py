@@ -1,3 +1,5 @@
+import os
+import sys
 from pynput.keyboard import HotKey
 
 
@@ -43,3 +45,21 @@ class HoldGlobeKey:
     def release(self, key):
         """Press and release signals are mixed for globe key"""
         self.press(key)
+
+
+def create_keylistener(transcriber, env_var="UTTERTYPE_RECORD_HOTKEYS"):
+    key_code = os.getenv(env_var, "")
+
+    if (sys.platform == "darwin") and (key_code in ["<globe>", ""]):
+        return HoldGlobeKey(
+            on_activate=transcriber.start_recording,
+            on_deactivate=transcriber.stop_recording,
+        )
+
+    key_code = key_code if key_code else "<ctrl>+<alt>+v"
+
+    return HoldHotKey(
+          HoldHotKey.parse(key_code),
+          on_activate=transcriber.start_recording,
+          on_deactivate=transcriber.stop_recording,
+      )
