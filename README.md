@@ -6,10 +6,15 @@
 
 ### 1. [Install PortAudio/PyAudio](https://people.csail.mit.edu/hubert/pyaudio/)
 #### macOS
-Installing portaudio on macOS can be somewhat tricky, especially on M1+ chips. In general, using conda seems to be the safest way to install portaudio
+Installing portaudio on macOS can be somewhat tricky, especially on M1+ chips (Apple Silicon). In general, using conda seems to be the safest way to install portaudio
 ```
 conda install portaudio
 ```
+If that doesn't work, try installing using Homebrew
+```sh
+brew install portaudio
+```
+
 #### Windows
 ```
 python -m pip install pyaudio
