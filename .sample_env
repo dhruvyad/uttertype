@@ -1,4 +1,4 @@
-# Choose your transcription provider (openai, google or local)
+# Choose your transcription provider (openai, google or mlx)
 UTTERTYPE_PROVIDER="openai"
 
 # ===== OpenAI Whisper API Settings =====
@@ -7,10 +7,11 @@ OPENAI_API_KEY="sk-<your_key_here>"
 OPENAI_BASE_URL="https://api.openai.com/v1"
 OPENAI_MODEL_NAME="whisper-1"
 
-# ===== Local Whisper Server Settings =====
-# Uncomment and configure for local lightning_whisper_mlx:
-# OPENAI_MODEL_NAME="Systran/faster-distil-whisper-large-v3"
-# OPENAI_MODEL_NAME="deepdml/faster-whisper-large-v3-turbo-ct2"
+# ===== Apple MLX Whisper Settings =====
+# Uncomment and configure for local Whisper MLX (Apple Silicon only):
+# UTTERTYPE_PROVIDER="mlx"
+# MLX_MODEL_NAME="distil-medium.en"
+# HF_TOKEN="your-huggingface-token"  # Required to download models from HuggingFace
 
 # ===== Google Gemini API Settings =====
 # Uncomment and configure for Google Gemini API:

@@ -25,6 +25,9 @@ dependencies = [
     "google-genai",
 ]
 
+[project.optional-dependencies]
+mlx = ["lightning-whisper-mlx"]
+
 [project.scripts]
 uttertype = "uttertype.main:run_app"
 

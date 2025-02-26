@@ -75,6 +75,9 @@ Select the provider you want to use by setting the `UTTERTYPE_PROVIDER` environm
 # OpenAI Whisper (default)
 UTTERTYPE_PROVIDER="openai"
 
+# Apple Silicon MLX (local, Mac only)
+UTTERTYPE_PROVIDER="mlx"
+
 # Google Gemini
 UTTERTYPE_PROVIDER="google"
 ```
@@ -87,6 +90,12 @@ Create a `.env` file in the project directory with the settings for your chosen 
 OPENAI_API_KEY="sk-your-key-here"
 OPENAI_BASE_URL="https://api.openai.com/v1"  # optional
 OPENAI_MODEL_NAME="whisper-1"  # optional
+
+# For Apple Silicon MLX (local, Mac only):
+# UTTERTYPE_PROVIDER="mlx"
+# MLX_MODEL_NAME="distil-medium.en"  # optional
+# HF_TOKEN="your-huggingface-token"  # Required to download models from HuggingFace
+# Note: Requires additional installation: uv sync --extra mlx
 
 # For Google Gemini:
 GEMINI_API_KEY="your-api-key-here"  # For Gemini developer API
@@ -108,6 +117,14 @@ export UTTERTYPE_PROVIDER="openai"
 export OPENAI_API_KEY="sk-your-key-here"
 export OPENAI_BASE_URL="https://api.openai.com/v1"  # optional
 export OPENAI_MODEL_NAME="whisper-1"  # optional
+```
+
+For Apple Silicon MLX (Mac only):
+```shell
+export UTTERTYPE_PROVIDER="mlx"
+export MLX_MODEL_NAME="distil-medium.en"  # optional
+export HF_TOKEN="your-huggingface-token"  # Required to download models
+# Note: Requires additional installation: uv sync --extra mlx
 ```
 
 For Gemini (Linux/macOS):
@@ -141,6 +158,33 @@ For faster and cheaper transcription, you can set up a local [faster-whisper-ser
    - `Systran/faster-whisper-small` (fastest)
    - `Systran/faster-distil-whisper-large-v3` (most accurate)
    - `deepdml/faster-whisper-large-v3-turbo-ct2` (almost as good, but faster)
+
+#### Using Apple Silicon MLX
+For the fastest local transcription on Apple Silicon Macs (M1/M2/M3):
+
+1. Install the MLX dependency:
+   ```shell
+   uv sync --extra mlx
+   ```
+   
+2. Configure in your .env file:
+   ```env
+   UTTERTYPE_PROVIDER="mlx"
+   MLX_MODEL_NAME="distil-medium.en"  # optional
+   HF_TOKEN="your-huggingface-token"  # Required to download models
+   ```
+   
+   Note: You'll need a HuggingFace token to download the models. You can get one by creating a free account at [huggingface.co](https://huggingface.co/join).
+
+This option uses [lightning-whisper-mlx](https://github.com/mustafaaljadery/lightning-whisper-mlx) with Apple's MLX framework to run Whisper models natively on the Neural Engine, providing very fast transcription without requiring an OpenAI API key.
+
+Available models for `MLX_MODEL_NAME` include:
+- `base.en` - Small, English-only model (fastest)
+- `small.en` - Better accuracy, English-only
+- `medium.en` - High accuracy, English-only
+- `distil-small.en` - Distilled version of small.en
+- `distil-medium.en` - Distilled version of medium.en (good balance of speed/accuracy)
+- `large-v2` - Most accurate, supports multiple languages
 
 ### 5. Final run and permissions
 Finally, run the application using one of these methods:

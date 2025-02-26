@@ -169,9 +169,18 @@ class WhisperAPITranscriber(AudioTranscriber):
 class WhisperLocalMLXTranscriber(AudioTranscriber):
     def __init__(self, model_type="distil-medium.en", *args, **kwargs):
         super().__init__(*args, **kwargs)
-        from lightning_whisper_mlx import LightningWhisperMLX
-
-        self.model = LightningWhisperMLX(model_type)
+        try:
+            from lightning_whisper_mlx import LightningWhisperMLX
+            self.model = LightningWhisperMLX(model_type)
+        except ImportError:
+            raise ImportError(
+                "lightning-whisper-mlx not found. Install with: uv sync --extra mlx"
+            )
+    
+    @staticmethod
+    def create(*args, **kwargs):
+        model_type = os.getenv('MLX_MODEL_NAME', 'distil-medium.en')
+        return WhisperLocalMLXTranscriber(model_type=model_type)
 
     def transcribe_audio(self, audio: io.BytesIO) -> str:
         try:
