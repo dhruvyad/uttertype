@@ -1,15 +1,32 @@
-# Defaults for OpenAI API:
+# Choose your transcription provider (openai or google)
+UTTERTYPE_PROVIDER="openai"
+
+# ===== OpenAI Whisper API Settings =====
+# Uncomment and configure for OpenAI Whisper API:
 # OPENAI_API_KEY="sk-<your_key_here>"
 # OPENAI_BASE_URL="https://api.openai.com/v1"
 # OPENAI_MODEL_NAME="whisper-1"
 
-
-# Defaults for local faster_whisper_server:
+# ===== Local Whisper Server Settings =====
+# Uncomment and configure for local faster_whisper_server:
 OPENAI_API_KEY="sk-<your_key_here>"
 OPENAI_BASE_URL="http://localhost:7000/v1"
-
 OPENAI_MODEL_NAME="Systran/faster-distil-whisper-large-v3"
 # OPENAI_MODEL_NAME="deepdml/faster-whisper-large-v3-turbo-ct2"
+
+# ===== Google Gemini API Settings =====
+# Uncomment and configure for Google Gemini API:
+# UTTERTYPE_PROVIDER="google"
+# GEMINI_API_KEY="<your_api_key_here>"
+# GEMINI_MODEL_NAME="gemini-2.0-flash"
+
+# ===== Google Vertex AI Settings =====
+# Uncomment and configure for Google Vertex AI:
+# UTTERTYPE_PROVIDER="google"
+# GEMINI_USE_VERTEX="true"
+# GEMINI_PROJECT_ID="<your_project_id>"
+# GEMINI_LOCATION="us-central1"
+# GEMINI_MODEL_NAME="gemini-2.0-flash"
 
 UTTERTYPE_RECORD_HOTKEYS="<ctrl>+<alt>+v"
 # UTTERTYPE_RECORD_HOTKEYS="<cmd>+<ctrl>"

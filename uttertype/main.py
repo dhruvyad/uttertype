@@ -1,7 +1,8 @@
 import asyncio
+import os
 from pynput import keyboard
 from dotenv import load_dotenv
-from uttertype.transcriber import WhisperAPITranscriber
+from uttertype.transcriber import WhisperAPITranscriber, GeminiTranscriber
 from uttertype.table_interface import ConsoleTable
 from uttertype.key_listener import create_keylistener
 from uttertype.utils import manual_type
@@ -10,7 +11,13 @@ from uttertype.utils import manual_type
 async def main():
     load_dotenv()
 
-    transcriber = WhisperAPITranscriber.create()
+    # Choose transcriber based on environment variable
+    transcriber_provider = os.getenv('UTTERTYPE_PROVIDER', 'openai').lower()
+    
+    if transcriber_provider == 'google':
+        transcriber = GeminiTranscriber.create()
+    else:
+        transcriber = WhisperAPITranscriber.create()
     hotkey = create_keylistener(transcriber)
 
     keyboard.Listener(on_press=hotkey.press, on_release=hotkey.release).start()

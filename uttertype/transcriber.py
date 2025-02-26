@@ -1,6 +1,6 @@
 import os
 import io
-from typing import List, Tuple
+from typing import List, Tuple, Optional, Union
 import pyaudio
 import wave
 from openai import OpenAI
@@ -9,6 +9,8 @@ from threading import Thread, Event
 import webrtcvad
 from uttertype.utils import transcription_concat
 import tempfile
+from google import genai
+from google.genai import types
 
 FORMAT = pyaudio.paInt16  # Audio format
 CHANNELS = 1  # Mono audio
@@ -175,4 +177,85 @@ class WhisperLocalMLXTranscriber(AudioTranscriber):
             return transcription
         except Exception as e:
             print(f"Encountered Error: {e}")
+            return ""
+
+
+class GeminiTranscriber(AudioTranscriber):
+    def __init__(self, 
+                 api_key: Optional[str] = None, 
+                 use_vertex: bool = False,
+                 project: Optional[str] = None, 
+                 location: str = "us-central1",
+                 model: str = "gemini-2.0-flash",
+                 *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        if use_vertex:
+            if not project:
+                project = os.getenv('GEMINI_PROJECT_ID')
+                if not project:
+                    raise ValueError("Project ID is required for Vertex AI. Set via GEMINI_PROJECT_ID env var or constructor.")
+            self.client = genai.Client(
+                vertexai=True,
+                project=project,
+                location=location
+            )
+        else:
+            if not api_key:
+                api_key = os.getenv('GEMINI_API_KEY')
+                if not api_key:
+                    raise ValueError("API key is required for Gemini API. Set via GEMINI_API_KEY env var or constructor.")
+            self.client = genai.Client(api_key=api_key)
+        
+        self.model_name = model
+        self.prompt = "The following is normal speech or technical speech from an engineer."
+    
+    @staticmethod
+    def create(*args, **kwargs):
+        use_vertex = os.getenv('GEMINI_USE_VERTEX', 'false').lower() in ('true', 'yes', '1', 't')
+        project = os.getenv('GEMINI_PROJECT_ID')
+        api_key = os.getenv('GEMINI_API_KEY')
+        model = os.getenv('GEMINI_MODEL_NAME', 'gemini-2.0-flash')
+        location = os.getenv('GEMINI_LOCATION', 'us-central1')
+        
+        return GeminiTranscriber(
+            api_key=api_key,
+            use_vertex=use_vertex,
+            project=project,
+            location=location,
+            model=model
+        )
+    
+    def transcribe_audio(self, audio: io.BytesIO) -> str:
+        try:
+            # Convert WAV to MP3 using temporary files
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as wav_file:
+                wav_file.write(audio.getvalue())
+                wav_path = wav_file.name
+            
+            # Read the audio file
+            with open(wav_path, 'rb') as f:
+                audio_bytes = f.read()
+            
+            # Clean up temporary file
+            os.unlink(wav_path)
+            
+            # Send to Gemini API
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=[
+                    self.prompt,
+                    types.Part.from_bytes(
+                        data=audio_bytes,
+                        mime_type='audio/wav',
+                    )
+                ]
+            )
+            
+            # Extract transcription from response
+            transcription = response.text.strip()
+            return transcription
+            
+        except Exception as e:
+            print(f"Gemini Transcription Error: {e}")
             return ""
