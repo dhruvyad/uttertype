@@ -174,7 +174,7 @@ class WhisperLocalMLXTranscriber(AudioTranscriber):
             self.model = LightningWhisperMLX(model_type)
         except ImportError:
             raise ImportError(
-                "lightning-whisper-mlx not found. Install with: pip install 'uttertype[mlx]'"
+                "lightning-whisper-mlx not found. Install with: uv sync --extra mlx"
             )
     
     @staticmethod

@@ -94,7 +94,7 @@ OPENAI_MODEL_NAME="whisper-1"  # optional
 # For Apple Silicon MLX (local, Mac only):
 # UTTERTYPE_PROVIDER="mlx"
 # MLX_MODEL_NAME="distil-medium.en"  # optional
-# Note: Requires additional installation: pip install 'uttertype[mlx]'
+# Note: Requires additional installation: uv sync --extra mlx
 
 # For Google Gemini:
 GEMINI_API_KEY="your-api-key-here"  # For Gemini developer API
@@ -122,7 +122,7 @@ For Apple Silicon MLX (Mac only):
 ```shell
 export UTTERTYPE_PROVIDER="mlx"
 export MLX_MODEL_NAME="distil-medium.en"  # optional
-# Note: Requires additional installation: pip install 'uttertype[mlx]'
+# Note: Requires additional installation: uv sync --extra mlx
 ```
 
 For Gemini (Linux/macOS):
@@ -162,7 +162,7 @@ For the fastest local transcription on Apple Silicon Macs (M1/M2/M3):
 
 1. Install the MLX dependency:
    ```shell
-   pip install 'uttertype[mlx]'
+   uv sync --extra mlx
    ```
    
 2. Configure in your .env file:
