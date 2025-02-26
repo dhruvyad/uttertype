@@ -96,6 +96,7 @@ GEMINI_MODEL_NAME="gemini-2.0-flash"  # optional
 GEMINI_USE_VERTEX="true"
 GEMINI_PROJECT_ID="your-gcp-project-id"
 GEMINI_LOCATION="us-central1"  # optional
+# Note: Authentication with gcloud is required for Vertex AI
 ```
 
 #### Option B: Using Environment Variables
@@ -121,6 +122,15 @@ export GEMINI_PROJECT_ID="your-gcp-project-id"
 For Windows, use `$env:` instead of `export`.
 
 See [`.sample_env`](.sample_env) in the repository for example configurations.
+
+#### Using Google Vertex AI
+When using Google Vertex AI, you need to authenticate with gcloud:
+
+1. Install the [Google Cloud CLI](https://cloud.google.com/sdk/docs/install)
+2. Authenticate using `gcloud auth application-default login`
+3. Make sure your account has the necessary permissions for Vertex AI
+
+For more information, see the [Vertex AI Authentication documentation](https://cloud.google.com/vertex-ai/docs/authentication).
 
 #### Using a Local Whisper Server
 For faster and cheaper transcription, you can set up a local [faster-whisper-server](https://github.com/fedirz/faster-whisper-server). When using a local server:
