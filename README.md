@@ -176,7 +176,15 @@ For the fastest local transcription on Apple Silicon Macs (M1/M2/M3):
    
    Note: You'll need a HuggingFace token to download the models. You can get one by creating a free account at [huggingface.co](https://huggingface.co/join).
 
-This option uses Apple's MLX framework to run Whisper models natively on the Neural Engine, providing very fast transcription without requiring an API key or internet connection.
+This option uses [lightning-whisper-mlx](https://github.com/mustafaaljadery/lightning-whisper-mlx) with Apple's MLX framework to run Whisper models natively on the Neural Engine, providing very fast transcription without requiring an OpenAI API key.
+
+Available models for `MLX_MODEL_NAME` include:
+- `base.en` - Small, English-only model (fastest)
+- `small.en` - Better accuracy, English-only
+- `medium.en` - High accuracy, English-only
+- `distil-small.en` - Distilled version of small.en
+- `distil-medium.en` - Distilled version of medium.en (good balance of speed/accuracy)
+- `large-v2` - Most accurate, supports multiple languages
 
 ### 5. Final run and permissions
 Finally, run the application using one of these methods:
