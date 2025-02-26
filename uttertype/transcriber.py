@@ -1,6 +1,6 @@
 import os
 import io
-from typing import List, Tuple, Optional, Union
+from typing import List, Tuple, Optional
 import pyaudio
 import wave
 from openai import OpenAI
@@ -9,6 +9,7 @@ from threading import Thread, Event
 import webrtcvad
 from uttertype.utils import transcription_concat
 import tempfile
+from textwrap import dedent
 from google import genai
 from google.genai import types
 
@@ -208,7 +209,11 @@ class GeminiTranscriber(AudioTranscriber):
             self.client = genai.Client(api_key=api_key)
         
         self.model_name = model
-        self.prompt = "The following is normal speech or technical speech from an engineer."
+        self.prompt = dedent("""\
+        The following is normal speech or technical speech from an engineer.
+        They may say special characters by their name (e.g. "underscore", "dash", "period").
+        When it contextually makes sense, replace special characters with their corresponding text.\
+        """)
     
     @staticmethod
     def create(*args, **kwargs):
