@@ -1,6 +1,6 @@
 import os
 import io
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 import pyaudio
 import wave
 from openai import OpenAI
@@ -9,6 +9,9 @@ from threading import Thread, Event
 import webrtcvad
 from uttertype.utils import transcription_concat
 import tempfile
+from textwrap import dedent
+from google import genai
+from google.genai import types
 
 FORMAT = pyaudio.paInt16  # Audio format
 CHANNELS = 1  # Mono audio
@@ -16,7 +19,8 @@ RATE = 16000  # Sample rate
 CHUNK_DURATION_MS = 30  # Frame duration in milliseconds
 CHUNK = int(RATE * CHUNK_DURATION_MS / 1000)
 MIN_TRANSCRIPTION_SIZE_MS = int(
-    os.getenv('UTTERTYPE_MIN_TRANSCRIPTION_SIZE_MS', 1500) # Minimum duration of speech to send to API in case of silence
+    # Minimum duration of speech to send to API between gaps of silence
+    os.getenv('UTTERTYPE_MIN_TRANSCRIPTION_SIZE_MS', 5000)
 )
 
 
@@ -88,19 +92,22 @@ class AudioTranscriber:
         self.rolling_transcriptions.append((idx, intermediate_transcription))
 
     def _finish_transcription(self):
-        transcription = self.transcribe_audio(
-            self._frames_to_wav()
-        )  # Last transcription
-        for request in self.rolling_requests:  # Wait for rolling requests
+        for request in self.rolling_requests:  # Wait for all of the rolling requests
             request.join()
-        self.rolling_transcriptions.append(
-            (len(self.rolling_transcriptions), transcription)
+
+        # Process the final transcription chunk
+        final_transcription_chunk = self.transcribe_audio(
+            self._frames_to_wav()
         )
-        sorted(self.rolling_transcriptions, key=lambda x: x[0])  # Sort by idx
-        transcriptions = [
-            t[1] for t in self.rolling_transcriptions
-        ]  # Get ordered transcriptions
-        self.event_loop.call_soon_threadsafe(  # Put final combined result in finished queue
+
+        # Sort by idx
+        sorted_transcription_chunks = sorted(self.rolling_transcriptions, key=lambda x: x[0])
+
+        # Get only the transcription texts
+        transcriptions = [t[1] for t in sorted_transcription_chunks] + [final_transcription_chunk]
+
+        # Put final combined result in finished queue
+        self.event_loop.call_soon_threadsafe(
             self.transcriptions.put_nowait,
             (transcription_concat(transcriptions), self.audio_duration),
         )
@@ -175,4 +182,108 @@ class WhisperLocalMLXTranscriber(AudioTranscriber):
             return transcription
         except Exception as e:
             print(f"Encountered Error: {e}")
+            return ""
+
+
+class GeminiTranscriber(AudioTranscriber):
+    def __init__(self, 
+                 api_key: Optional[str] = None, 
+                 use_vertex: bool = False,
+                 project: Optional[str] = None, 
+                 location: str = "us-central1",
+                 model: str = "gemini-2.0-flash",
+                 *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        if use_vertex:
+            if not project:
+                raise ValueError("Project ID is required for Vertex AI")
+            self.client = genai.Client(
+                vertexai=True,
+                project=project,
+                location=location
+            )
+        else:
+            if not api_key:
+                raise ValueError("API key is required for Gemini API")
+            self.client = genai.Client(api_key=api_key)
+        
+        self.model_name = model
+        self.transcription_prompt = dedent("""\
+        Audio Transcription Guidelines
+
+        Your task is to transcribe the provided audio accurately. Whether the audio contains normal speech or technical content with varied speeds, please adhere to the following guidelines:
+
+        1. Transcribe exactly what is spoken, preserving the original meaning and content.
+
+        2. Assume English is spoken, unless it is clear another language is spoken.
+
+        3. Numbers should be numerical and not written as words.
+
+        4. For special characters that are spoken by name (such as "underscore," "dash," "period"), convert them to their corresponding symbols (_, -, .) when contextually appropriate, such as in:
+          - Email addresses
+          - Website URLs
+          - File names
+          - Programming code
+          - Mathematical expressions
+
+        5. Maintain proper punctuation, capitalization, and paragraph breaks to enhance readability.
+
+        6. For technical content, preserve technical terms, acronyms, and specialized vocabulary exactly as spoken.
+
+        Ready to begin transcription when you provide the audio.""")
+
+        self.postprocessing_prompt = dedent("""\
+        Post-processing Guidelines
+
+        1. Remove any ums and uhs. Connect their thought so that it is fluid.
+
+        2. The user may have self-edited while speaking. If the user corrects themselves (usually via some interjection like "I meant" or "no, no"), edit the transcription to reflect their intended meaning rather than including the correction process itself.
+
+        <EXAMPLE>
+        User Said: "The art of doing science and engineering. I mean just science."
+        Expected Transcription: "The art of doing science."
+        </EXAMPLE>""")
+
+    @staticmethod
+    def create(*args, **kwargs):
+        use_vertex = os.getenv('GEMINI_USE_VERTEX', 'false').lower() in ('true', 'yes', '1', 't')
+        project = os.getenv('GEMINI_PROJECT_ID')
+        api_key = os.getenv('GEMINI_API_KEY')
+        model = os.getenv('GEMINI_MODEL_NAME', 'gemini-2.0-flash')
+        location = os.getenv('GEMINI_LOCATION', 'us-central1')
+        
+        return GeminiTranscriber(
+            api_key=api_key,
+            use_vertex=use_vertex,
+            project=project,
+            location=location,
+            model=model
+        )
+    
+    def transcribe_audio(self, audio: io.BytesIO) -> str:
+        print("CALLED!")
+        try:
+            # Get the audio bytes directly from the BytesIO object
+            audio_bytes = audio.getvalue()
+            
+            # Send to Gemini API
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=[
+                    self.transcription_prompt,
+                    types.Part.from_bytes(
+                        data=audio_bytes,
+                        mime_type='audio/wav',
+                    ),
+                    self.postprocessing_prompt,
+                ]
+            )
+
+            # Extract transcription from response
+            transcription = response.text.strip()
+            return transcription
+            
+        except Exception as e:
+            print(f"Gemini Transcription Error: {e}")
             return ""

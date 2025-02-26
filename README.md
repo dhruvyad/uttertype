@@ -31,9 +31,8 @@ Choose one of the following methods to install the required dependencies:
 
 #### Option A: Using uv (Recommended)
 First, install uv if you haven't already:
-```shell
-pip install uv
-```
+
+See the [uv installation documentation](https://docs.astral.sh/uv/getting-started/installation/).
 
 Then, create a virtual environment and install dependencies:
 ```shell
@@ -64,56 +63,81 @@ ImportError: /home/soul/anaconda3/lib/libstdc++.so.6: version `GLIBCXX_3.4.32' n
 Check out [StackOverflow](https://stackoverflow.com/questions/72540359/glibcxx-3-4-30-not-found-for-librosa-in-conda-virtual-environment-after-tryin) and [Berkley](https://bcourses.berkeley.edu/courses/1478831/pages/glibcxx-missing)
 
 
-### 4. Configure OpenAI Settings
+### 4. Configure Speech Recognition Settings
 
-You can configure uttertype to work with either OpenAI's official API or a local Whisper server. There are two ways to set this up:
+You can configure uttertype to work with either OpenAI's Whisper API, Google's Gemini API, or a local Whisper server. 
 
-#### Option A: Using a .env file (Recommended)
-Create a `.env` file in the project directory with these settings:
+#### Choose Speech Recognition Provider
+
+Select the provider you want to use by setting the `UTTERTYPE_PROVIDER` environment variable:
 
 ```env
-# 1. Required: Your API key
+# OpenAI Whisper (default)
+UTTERTYPE_PROVIDER="openai"
+
+# Google Gemini
+UTTERTYPE_PROVIDER="google"
+```
+
+#### Option A: Using a .env file (Recommended)
+Create a `.env` file in the project directory with the settings for your chosen provider:
+
+```env
+# For OpenAI Whisper:
 OPENAI_API_KEY="sk-your-key-here"
+OPENAI_BASE_URL="https://api.openai.com/v1"  # optional
+OPENAI_MODEL_NAME="whisper-1"  # optional
 
-# 2. Optional: Choose your API endpoint
-# For OpenAI's official API (default):
-OPENAI_BASE_URL="https://api.openai.com/v1"
-# OR for a local [Faster Whisper server](https://github.com/fedirz/faster-whisper-server):
-OPENAI_BASE_URL="http://localhost:7000/v1"
+# For Google Gemini:
+GEMINI_API_KEY="your-api-key-here"  # For Gemini developer API
+GEMINI_MODEL_NAME="gemini-2.0-flash"  # optional
 
-# 3. Optional: Select your preferred model
-# For OpenAI's official API:
-OPENAI_MODEL_NAME="whisper-1"
-# OR for local Whisper server, some options include:
-OPENAI_MODEL_NAME="Systran/faster-whisper-small"
-OPENAI_MODEL_NAME="Systran/faster-distil-whisper-large-v3"
-OPENAI_MODEL_NAME="deepdml/faster-whisper-large-v3-turbo-ct2"
+# For Google Vertex AI (enterprise):
+GEMINI_USE_VERTEX="true"
+GEMINI_PROJECT_ID="your-gcp-project-id"
+GEMINI_LOCATION="us-central1"  # optional
+# Note: Authentication with gcloud is required for Vertex AI
 ```
 
 #### Option B: Using Environment Variables
 You can also set these values directly in your terminal:
 
-For Linux/macOS:
+For OpenAI (Linux/macOS):
 ```shell
+export UTTERTYPE_PROVIDER="openai"
 export OPENAI_API_KEY="sk-your-key-here"
-export OPENAI_BASE_URL="https://api.openai.com/v1" # optional
-export OPENAI_MODEL_NAME="whisper-1" # optional
+export OPENAI_BASE_URL="https://api.openai.com/v1"  # optional
+export OPENAI_MODEL_NAME="whisper-1"  # optional
 ```
 
-For Windows:
+For Gemini (Linux/macOS):
 ```shell
-$env:OPENAI_API_KEY = "sk-your-key-here"
-$env:OPENAI_BASE_URL = "https://api.openai.com/v1"  # optional
-$env:OPENAI_MODEL_NAME = "whisper-1"  # optional
+export UTTERTYPE_PROVIDER="google"
+export GEMINI_API_KEY="your-api-key-here"
+# or for Vertex AI
+export GEMINI_USE_VERTEX="true"
+export GEMINI_PROJECT_ID="your-gcp-project-id"
 ```
+
+For Windows, use `$env:` instead of `export`.
 
 See [`.sample_env`](.sample_env) in the repository for example configurations.
+
+#### Using Google Vertex AI
+When using Google Vertex AI, you need to authenticate with gcloud:
+
+1. Install the [Google Cloud CLI](https://cloud.google.com/sdk/docs/install)
+2. Authenticate using `gcloud auth application-default login`
+3. Make sure your account has the necessary permissions for Vertex AI
+
+For more information, see the [Vertex AI Authentication documentation](https://cloud.google.com/vertex-ai/docs/authentication).
 
 #### Using a Local Whisper Server
 For faster and cheaper transcription, you can set up a local [faster-whisper-server](https://github.com/fedirz/faster-whisper-server). When using a local server:
 
-1. Set `OPENAI_BASE_URL` to your server's address (e.g., `http://localhost:7000/v1`)
-2. Choose from supported local models like:
+1. Set `UTTERTYPE_PROVIDER="openai"` to use the OpenAI compatible interface
+2. Set `OPENAI_BASE_URL` to your server's address (e.g., `http://localhost:7000/v1`)
+3. Choose from supported local models like:
    - `Systran/faster-whisper-small` (fastest)
    - `Systran/faster-distil-whisper-large-v3` (most accurate)
    - `deepdml/faster-whisper-large-v3-turbo-ct2` (almost as good, but faster)

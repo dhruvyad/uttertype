@@ -1,16 +1,25 @@
-import asyncio
-from pynput import keyboard
 from dotenv import load_dotenv
-from uttertype.transcriber import WhisperAPITranscriber
+load_dotenv()  # Load environment variables up front
+
+import asyncio
+import os
+from pynput import keyboard
+from uttertype.transcriber import WhisperAPITranscriber, GeminiTranscriber
 from uttertype.table_interface import ConsoleTable
 from uttertype.key_listener import create_keylistener
 from uttertype.utils import manual_type
 
-
 async def main():
-    load_dotenv()
+    # Choose transcriber based on environment variable
+    transcriber_provider = os.getenv('UTTERTYPE_PROVIDER', 'openai').lower()
+    
+    if transcriber_provider == 'google':
+        transcriber = GeminiTranscriber.create()
+    elif transcriber_provider == 'openai':
+        transcriber = WhisperAPITranscriber.create()
+    else:
+        raise ValueError(f'Invalid transcriber provider: {transcriber_provider}')
 
-    transcriber = WhisperAPITranscriber.create()
     hotkey = create_keylistener(transcriber)
 
     keyboard.Listener(on_press=hotkey.press, on_release=hotkey.release).start()

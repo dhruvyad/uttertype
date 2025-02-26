@@ -1,18 +1,30 @@
-# Defaults for OpenAI API:
-# OPENAI_API_KEY="sk-<your_key_here>"
-# OPENAI_BASE_URL="https://api.openai.com/v1"
-# OPENAI_MODEL_NAME="whisper-1"
+# Choose your transcription provider (openai, google or local)
+UTTERTYPE_PROVIDER="openai"
 
-
-# Defaults for local faster_whisper_server:
+# ===== OpenAI Whisper API Settings =====
+# Uncomment and configure for OpenAI Whisper API:
 OPENAI_API_KEY="sk-<your_key_here>"
-OPENAI_BASE_URL="http://localhost:7000/v1"
+OPENAI_BASE_URL="https://api.openai.com/v1"
+OPENAI_MODEL_NAME="whisper-1"
 
-OPENAI_MODEL_NAME="Systran/faster-distil-whisper-large-v3"
+# ===== Local Whisper Server Settings =====
+# Uncomment and configure for local lightning_whisper_mlx:
+# OPENAI_MODEL_NAME="Systran/faster-distil-whisper-large-v3"
 # OPENAI_MODEL_NAME="deepdml/faster-whisper-large-v3-turbo-ct2"
 
-UTTERTYPE_RECORD_HOTKEYS="<ctrl>+<alt>+v"
-# UTTERTYPE_RECORD_HOTKEYS="<cmd>+<ctrl>"
+# ===== Google Gemini API Settings =====
+# Uncomment and configure for Google Gemini API:
+# GEMINI_API_KEY="<your_api_key_here>"
+# GEMINI_MODEL_NAME="gemini-2.0-flash"
 
-# Minimum duration of speech to send to API in case of silence
-UTTERTYPE_MIN_TRANSCRIPTION_SIZE_MS=10000 # defaults to: 1500
+# ===== Google Vertex AI Settings =====
+# Uncomment and configure for Google Vertex AI:
+# GEMINI_USE_VERTEX="true"
+# GEMINI_PROJECT_ID="<your_project_id>"
+# GEMINI_LOCATION="us-central1"
+# GEMINI_MODEL_NAME="gemini-2.0-flash"
+
+# UTTERTYPE_RECORD_HOTKEYS="<ctrl>+<alt>+v" # defaults to <globe> on Mac, <ctrl>+<alt>+v otherwise
+
+# Minimum duration of speech to send to API between gaps of silence
+# UTTERTYPE_MIN_TRANSCRIPTION_SIZE_MS=<time-in-ms> # defaults to: 5000

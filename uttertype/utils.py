@@ -36,4 +36,4 @@ def manual_type(text: str, delay: float = 0.0042):
 
 
 def transcription_concat(transcriptions: List[str]) -> str:
-    return " ".join([_t.strip() for _t in transcriptions])  # Simple concat for now
+    return " ".join([t.strip() for t in transcriptions])  # Simple concat for now
