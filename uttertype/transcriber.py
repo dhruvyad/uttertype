@@ -236,11 +236,13 @@ class GeminiTranscriber(AudioTranscriber):
         self.postprocessing_prompt = dedent("""\
         Post-processing Guidelines
 
-        You are given a transcription in which the user may have self-edited. If the speaker corrects themselves, edit the transcription to reflect their intended meaning rather than including the correction process itself.
+        1. Remove any ums and uhs. Connect their thought so that it is fluid.
+
+        2. The user may have self-edited while speaking. If the user corrects themselves (usually via some interjection like "I meant" or "no, no"), edit the transcription to reflect their intended meaning rather than including the correction process itself.
 
         <EXAMPLE>
-        User Said: "This is a test again, 1, 2, 3, 4. Actually, no, no. Just 1 2 3."
-        Expected Transcription: "This is a test again, 1, 2, 3"
+        User Said: "The art of doing science and engineering. I mean just science."
+        Expected Transcription: "The art of doing science."
         </EXAMPLE>""")
 
     @staticmethod
@@ -260,6 +262,7 @@ class GeminiTranscriber(AudioTranscriber):
         )
     
     def transcribe_audio(self, audio: io.BytesIO) -> str:
+        print("CALLED!")
         try:
             # Get the audio bytes directly from the BytesIO object
             audio_bytes = audio.getvalue()
