@@ -94,6 +94,7 @@ OPENAI_MODEL_NAME="whisper-1"  # optional
 # For Apple Silicon MLX (local, Mac only):
 # UTTERTYPE_PROVIDER="mlx"
 # MLX_MODEL_NAME="distil-medium.en"  # optional
+# HF_TOKEN="your-huggingface-token"  # Required to download models from HuggingFace
 # Note: Requires additional installation: uv sync --extra mlx
 
 # For Google Gemini:
@@ -122,6 +123,7 @@ For Apple Silicon MLX (Mac only):
 ```shell
 export UTTERTYPE_PROVIDER="mlx"
 export MLX_MODEL_NAME="distil-medium.en"  # optional
+export HF_TOKEN="your-huggingface-token"  # Required to download models
 # Note: Requires additional installation: uv sync --extra mlx
 ```
 
@@ -169,7 +171,10 @@ For the fastest local transcription on Apple Silicon Macs (M1/M2/M3):
    ```env
    UTTERTYPE_PROVIDER="mlx"
    MLX_MODEL_NAME="distil-medium.en"  # optional
+   HF_TOKEN="your-huggingface-token"  # Required to download models
    ```
+   
+   Note: You'll need a HuggingFace token to download the models. You can get one by creating a free account at [huggingface.co](https://huggingface.co/join).
 
 This option uses Apple's MLX framework to run Whisper models natively on the Neural Engine, providing very fast transcription without requiring an API key or internet connection.
 

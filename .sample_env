@@ -11,6 +11,7 @@ OPENAI_MODEL_NAME="whisper-1"
 # Uncomment and configure for local Whisper MLX (Apple Silicon only):
 # UTTERTYPE_PROVIDER="mlx"
 # MLX_MODEL_NAME="distil-medium.en"
+# HF_TOKEN="your-huggingface-token"  # Required to download models from HuggingFace
 
 # ===== Google Gemini API Settings =====
 # Uncomment and configure for Google Gemini API:
