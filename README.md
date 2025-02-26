@@ -29,25 +29,31 @@ For more context, view the [pynput documentation for using HotKeys](https://pynp
 ### 3. Install Dependencies
 Choose one of the following methods to install the required dependencies:
 
-#### Option A: Using pip
+#### Option A: Using uv (Recommended)
+First, install uv if you haven't already:
 ```shell
-python -m pip install -r requirements.txt
+pip install uv
 ```
 
-#### Option B: Using pipenv
-First, install pipenv if you haven't already:
+Then, create a virtual environment and install dependencies:
 ```shell
-pip install pipenv
+uv sync
 ```
 
-Then, install dependencies using pipenv:
+This will:
+- Create a virtual environment in `.venv`
+- Install all dependencies specified in pyproject.toml
+- Install the uttertype package in development mode
+
+Activate the virtual environment:
 ```shell
-pipenv install
+source .venv/bin/activate  # On Linux/macOS
+.venv\Scripts\activate     # On Windows
 ```
 
-This will create a virtual environment and install all dependencies from the Pipfile. To activate the environment:
+#### Option B: Using pip
 ```shell
-pipenv shell
+pip install -e .
 ```
 
 
@@ -113,13 +119,20 @@ For faster and cheaper transcription, you can set up a local [faster-whisper-ser
    - `deepdml/faster-whisper-large-v3-turbo-ct2` (almost as good, but faster)
 
 ### 5. Final run and permissions
-Finally, run main.py
+Finally, run the application using one of these methods:
+
 ```shell
+# Method 1: Run directly from project root
+python -m uttertype.main
+
+# Method 2: Run the wrapper script (simplest)
 python main.py
-```
-OR
-```shell
-./start_uttertype.sh # installed and configured pipenv environment would be needed
+
+# Method 3: Run the installed command (after activating virtual environment)
+uttertype
+
+# Method 4: Run with tmux (starts in background, auto-creates uv environment)
+./start_uttertype.sh
 ```
 
 When the program first runs, you will likely need to give it sufficient permissions. On macOS, this will include adding terminal to accessibility under `Privacy and Security > Accessibility`, giving it permission to monitor the keyboard, and finally giving it permission to record using the microphone.

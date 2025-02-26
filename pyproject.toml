@@ -1,0 +1,31 @@
+[build-system]
+requires = ["hatchling", "setuptools>=61.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "uttertype"
+version = "0.1.0"
+description = "Speech-to-text transcription tool for keyboard input"
+readme = "README.md"
+requires-python = ">=3.10, <3.13"
+license = {text = "MIT"}
+authors = [
+    {name = "Uttertype Team"}
+]
+dependencies = [
+    "openai",
+    "PyAudio",
+    "PyAutoGUI",
+    "pynput",
+    "pyperclip",
+    "python-dotenv",
+    "rich",
+    "webrtcvad",
+    "setuptools",
+]
+
+[project.scripts]
+uttertype = "uttertype.main:run_app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["uttertype"]

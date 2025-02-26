@@ -9,15 +9,16 @@ if ! command -v tmux &> /dev/null; then
     exit 1
 fi
 
-# Check if pipenv is installed and create virtual environment if needed
-if command -v pipenv &> /dev/null; then
+# Check if uv is installed and create virtual environment if needed
+if command -v uv &> /dev/null; then
     cd "$SCRIPT_DIR"
-    # Create/update virtual environment if needed
-    pipenv install --quiet
-    # Get the path to the virtual environment's Python
-    VENV_PYTHON=$(pipenv --py)
+    # Create virtual environment and install dependencies if needed
+    if [ ! -d ".venv" ]; then
+        uv sync
+    fi
+    VENV_PYTHON="$SCRIPT_DIR/.venv/bin/python"
 else
-    echo "pipenv is not installed. Using system Python."
+    echo "uv is not installed. Using system Python."
     VENV_PYTHON=$(which python)
 fi
 

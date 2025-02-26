@@ -1,15 +1,6 @@
-# macOS
-.DS_Store
-.AppleDouble
-.LSOverride
-
-# Ignore audio.wav
-audio.wav
-
-# Ignore env variables file
 .env
-
 __pycache__/
-dist
-build
-main.spec
+*.py[cod]
+*.class
+.venv/
+uv.lock
