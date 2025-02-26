@@ -1,17 +1,15 @@
-# Choose your transcription provider (openai or google)
+# Choose your transcription provider (openai, google or local)
 UTTERTYPE_PROVIDER="openai"
 
 # ===== OpenAI Whisper API Settings =====
 # Uncomment and configure for OpenAI Whisper API:
-# OPENAI_API_KEY="sk-<your_key_here>"
-# OPENAI_BASE_URL="https://api.openai.com/v1"
-# OPENAI_MODEL_NAME="whisper-1"
+OPENAI_API_KEY="sk-<your_key_here>"
+OPENAI_BASE_URL="https://api.openai.com/v1"
+OPENAI_MODEL_NAME="whisper-1"
 
 # ===== Local Whisper Server Settings =====
-# Uncomment and configure for local faster_whisper_server:
-OPENAI_API_KEY="sk-<your_key_here>"
-OPENAI_BASE_URL="http://localhost:7000/v1"
-OPENAI_MODEL_NAME="Systran/faster-distil-whisper-large-v3"
+# Uncomment and configure for local lightning_whisper_mlx:
+# OPENAI_MODEL_NAME="Systran/faster-distil-whisper-large-v3"
 # OPENAI_MODEL_NAME="deepdml/faster-whisper-large-v3-turbo-ct2"
 
 # ===== Google Gemini API Settings =====
@@ -32,4 +30,4 @@ UTTERTYPE_RECORD_HOTKEYS="<ctrl>+<alt>+v"
 # UTTERTYPE_RECORD_HOTKEYS="<cmd>+<ctrl>"
 
 # Minimum duration of speech to send to API in case of silence
-UTTERTYPE_MIN_TRANSCRIPTION_SIZE_MS=10000 # defaults to: 1500
+UTTERTYPE_MIN_TRANSCRIPTION_SIZE_MS=2000 # defaults to: 1500

@@ -16,8 +16,11 @@ async def main():
     
     if transcriber_provider == 'google':
         transcriber = GeminiTranscriber.create()
-    else:
+    elif transcriber_provider == 'openai':
         transcriber = WhisperAPITranscriber.create()
+    else:
+        raise ValueError(f'Invalid transcriber provider: {transcriber_provider}')
+
     hotkey = create_keylistener(transcriber)
 
     keyboard.Listener(on_press=hotkey.press, on_release=hotkey.release).start()
