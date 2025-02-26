@@ -7,7 +7,7 @@ from openai import OpenAI
 import asyncio
 from threading import Thread, Event
 import webrtcvad
-from utils import transcription_concat
+from uttertype.utils import transcription_concat
 import tempfile
 
 FORMAT = pyaudio.paInt16  # Audio format
