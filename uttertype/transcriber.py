@@ -206,10 +206,26 @@ class GeminiTranscriber(AudioTranscriber):
         
         self.model_name = model
         self.prompt = dedent("""\
-        The following is normal speech or technical speech from an engineer.
-        They may say special characters by their name (e.g. "underscore", "dash", "period").
-        When it contextually makes sense, replace special characters with their corresponding text.\
-        """)
+        Audio Transcription Guidelines
+
+        Your task is to transcribe the provided audio accurately. Whether the audio contains normal speech or technical content with varied speeds, please adhere to the following guidelines:
+
+        1. Transcribe exactly what is spoken, preserving the original meaning and content.
+
+        2. If the speaker corrects themselves, edit the transcription to reflect their intended meaning rather than including the correction process itself.
+
+        3. For special characters that are spoken by name (such as "underscore," "dash," "period"), convert them to their corresponding symbols (_, -, .) when contextually appropriate, such as in:
+          - Email addresses
+          - Website URLs
+          - File names
+          - Programming code
+          - Mathematical expressions
+
+        4. Maintain proper punctuation, capitalization, and paragraph breaks to enhance readability.
+
+        5. For technical content, preserve technical terms, acronyms, and specialized vocabulary exactly as spoken.
+
+        Ready to begin transcription when you provide the audio.""")
     
     @staticmethod
     def create(*args, **kwargs):

@@ -14,13 +14,11 @@ OPENAI_MODEL_NAME="whisper-1"
 
 # ===== Google Gemini API Settings =====
 # Uncomment and configure for Google Gemini API:
-# UTTERTYPE_PROVIDER="google"
 # GEMINI_API_KEY="<your_api_key_here>"
 # GEMINI_MODEL_NAME="gemini-2.0-flash"
 
 # ===== Google Vertex AI Settings =====
 # Uncomment and configure for Google Vertex AI:
-# UTTERTYPE_PROVIDER="google"
 # GEMINI_USE_VERTEX="true"
 # GEMINI_PROJECT_ID="<your_project_id>"
 # GEMINI_LOCATION="us-central1"
