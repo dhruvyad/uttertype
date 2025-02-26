@@ -60,6 +60,7 @@ class AudioTranscriber:
                 if (
                     not is_speech
                     and current_audio_duration >= MIN_TRANSCRIPTION_SIZE_MS
+                    and False
                 ):  # silence
                     rolling_request = Thread(
                         target=self._intermediate_transcription,
@@ -205,28 +206,40 @@ class GeminiTranscriber(AudioTranscriber):
             self.client = genai.Client(api_key=api_key)
         
         self.model_name = model
-        self.prompt = dedent("""\
+        self.pre_prompt = dedent("""\
         Audio Transcription Guidelines
 
         Your task is to transcribe the provided audio accurately. Whether the audio contains normal speech or technical content with varied speeds, please adhere to the following guidelines:
 
         1. Transcribe exactly what is spoken, preserving the original meaning and content.
 
-        2. If the speaker corrects themselves, edit the transcription to reflect their intended meaning rather than including the correction process itself.
+        2. Assume English is spoken, unless it is clear another language is spoken.
 
-        3. For special characters that are spoken by name (such as "underscore," "dash," "period"), convert them to their corresponding symbols (_, -, .) when contextually appropriate, such as in:
+        3. Numbers should be numerical and not written as words.
+
+        4. For special characters that are spoken by name (such as "underscore," "dash," "period"), convert them to their corresponding symbols (_, -, .) when contextually appropriate, such as in:
           - Email addresses
           - Website URLs
           - File names
           - Programming code
           - Mathematical expressions
 
-        4. Maintain proper punctuation, capitalization, and paragraph breaks to enhance readability.
+        5. Maintain proper punctuation, capitalization, and paragraph breaks to enhance readability.
 
-        5. For technical content, preserve technical terms, acronyms, and specialized vocabulary exactly as spoken.
+        6. For technical content, preserve technical terms, acronyms, and specialized vocabulary exactly as spoken.
 
         Ready to begin transcription when you provide the audio.""")
-    
+
+        self.post_prompt = dedent("""\
+        Post-processing Guidelines
+
+        You are given a transcription in which the user may have self-edited. If the speaker corrects themselves, edit the transcription to reflect their intended meaning rather than including the correction process itself.
+
+        <EXAMPLE>
+        User Said: "This is a test again, 1, 2, 3, 4. Actually, no, no. Just 1 2 3."
+        Expected Transcription: "This is a test again, 1, 2, 3"
+        </EXAMPLE>""")
+
     @staticmethod
     def create(*args, **kwargs):
         use_vertex = os.getenv('GEMINI_USE_VERTEX', 'false').lower() in ('true', 'yes', '1', 't')
@@ -245,30 +258,22 @@ class GeminiTranscriber(AudioTranscriber):
     
     def transcribe_audio(self, audio: io.BytesIO) -> str:
         try:
-            # Convert WAV to MP3 using temporary files
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as wav_file:
-                wav_file.write(audio.getvalue())
-                wav_path = wav_file.name
-            
-            # Read the audio file
-            with open(wav_path, 'rb') as f:
-                audio_bytes = f.read()
-            
-            # Clean up temporary file
-            os.unlink(wav_path)
+            # Get the audio bytes directly from the BytesIO object
+            audio_bytes = audio.getvalue()
             
             # Send to Gemini API
             response = self.client.models.generate_content(
                 model=self.model_name,
                 contents=[
-                    self.prompt,
+                    self.pre_prompt,
                     types.Part.from_bytes(
                         data=audio_bytes,
                         mime_type='audio/wav',
-                    )
+                    ),
+                    self.post_prompt,
                 ]
             )
-            
+
             # Extract transcription from response
             transcription = response.text.strip()
             return transcription
