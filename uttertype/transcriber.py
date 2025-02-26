@@ -262,7 +262,6 @@ class GeminiTranscriber(AudioTranscriber):
         )
     
     def transcribe_audio(self, audio: io.BytesIO) -> str:
-        print("CALLED!")
         try:
             # Get the audio bytes directly from the BytesIO object
             audio_bytes = audio.getvalue()
