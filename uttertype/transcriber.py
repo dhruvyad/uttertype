@@ -92,19 +92,22 @@ class AudioTranscriber:
         self.rolling_transcriptions.append((idx, intermediate_transcription))
 
     def _finish_transcription(self):
-        transcription = self.transcribe_audio(
-            self._frames_to_wav()
-        )  # Last transcription
-        for request in self.rolling_requests:  # Wait for rolling requests
+        for request in self.rolling_requests:  # Wait for all of the rolling requests
             request.join()
-        self.rolling_transcriptions.append(
-            (len(self.rolling_transcriptions), transcription)
+
+        # Process the final transcription chunk
+        final_transcription_chunk = self.transcribe_audio(
+            self._frames_to_wav()
         )
-        sorted(self.rolling_transcriptions, key=lambda x: x[0])  # Sort by idx
-        transcriptions = [
-            t[1] for t in self.rolling_transcriptions
-        ]  # Get ordered transcriptions
-        self.event_loop.call_soon_threadsafe(  # Put final combined result in finished queue
+
+        # Sort by idx
+        sorted_transcription_chunks = sorted(self.rolling_transcriptions, key=lambda x: x[0])
+
+        # Get only the transcription texts
+        transcriptions = [t[1] for t in sorted_transcription_chunks] + [final_transcription_chunk]
+
+        # Put final combined result in finished queue
+        self.event_loop.call_soon_threadsafe(
             self.transcriptions.put_nowait,
             (transcription_concat(transcriptions), self.audio_duration),
         )

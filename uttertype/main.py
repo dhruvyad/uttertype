@@ -1,16 +1,15 @@
+from dotenv import load_dotenv
+load_dotenv()  # Load environment variables up front
+
 import asyncio
 import os
 from pynput import keyboard
-from dotenv import load_dotenv
 from uttertype.transcriber import WhisperAPITranscriber, GeminiTranscriber
 from uttertype.table_interface import ConsoleTable
 from uttertype.key_listener import create_keylistener
 from uttertype.utils import manual_type
 
-
 async def main():
-    load_dotenv()
-
     # Choose transcriber based on environment variable
     transcriber_provider = os.getenv('UTTERTYPE_PROVIDER', 'openai').lower()
     
