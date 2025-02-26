@@ -209,7 +209,7 @@ class GeminiTranscriber(AudioTranscriber):
             self.client = genai.Client(api_key=api_key)
         
         self.model_name = model
-        self.pre_prompt = dedent("""\
+        self.transcription_prompt = dedent("""\
         Audio Transcription Guidelines
 
         Your task is to transcribe the provided audio accurately. Whether the audio contains normal speech or technical content with varied speeds, please adhere to the following guidelines:
@@ -233,7 +233,7 @@ class GeminiTranscriber(AudioTranscriber):
 
         Ready to begin transcription when you provide the audio.""")
 
-        self.post_prompt = dedent("""\
+        self.postprocessing_prompt = dedent("""\
         Post-processing Guidelines
 
         You are given a transcription in which the user may have self-edited. If the speaker corrects themselves, edit the transcription to reflect their intended meaning rather than including the correction process itself.
@@ -268,12 +268,12 @@ class GeminiTranscriber(AudioTranscriber):
             response = self.client.models.generate_content(
                 model=self.model_name,
                 contents=[
-                    self.pre_prompt,
+                    self.transcription_prompt,
                     types.Part.from_bytes(
                         data=audio_bytes,
                         mime_type='audio/wav',
                     ),
-                    self.post_prompt,
+                    self.postprocessing_prompt,
                 ]
             )
 
