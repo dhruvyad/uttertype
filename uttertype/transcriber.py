@@ -193,9 +193,7 @@ class GeminiTranscriber(AudioTranscriber):
         
         if use_vertex:
             if not project:
-                project = os.getenv('GEMINI_PROJECT_ID')
-                if not project:
-                    raise ValueError("Project ID is required for Vertex AI. Set via GEMINI_PROJECT_ID env var or constructor.")
+                raise ValueError("Project ID is required for Vertex AI")
             self.client = genai.Client(
                 vertexai=True,
                 project=project,
@@ -203,9 +201,7 @@ class GeminiTranscriber(AudioTranscriber):
             )
         else:
             if not api_key:
-                api_key = os.getenv('GEMINI_API_KEY')
-                if not api_key:
-                    raise ValueError("API key is required for Gemini API. Set via GEMINI_API_KEY env var or constructor.")
+                raise ValueError("API key is required for Gemini API")
             self.client = genai.Client(api_key=api_key)
         
         self.model_name = model
