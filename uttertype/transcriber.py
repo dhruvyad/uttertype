@@ -18,10 +18,8 @@ CHANNELS = 1  # Mono audio
 RATE = 16000  # Sample rate
 CHUNK_DURATION_MS = 30  # Frame duration in milliseconds
 CHUNK = int(RATE * CHUNK_DURATION_MS / 1000)
-MIN_TRANSCRIPTION_SIZE_MS = int(
-    # Minimum duration of speech to send to API between gaps of silence
-    os.getenv('UTTERTYPE_MIN_TRANSCRIPTION_SIZE_MS', 5000)
-)
+# Minimum duration of speech to send to API between gaps of silence (hard-coded to 10 seconds)
+MIN_TRANSCRIPTION_SIZE_MS = 10000
 
 
 class AudioTranscriber:
@@ -218,7 +216,7 @@ class GeminiTranscriber(AudioTranscriber):
             self.client = genai.Client(api_key=api_key)
         
         self.model_name = model
-        self.transcription_prompt = dedent("""\
+        self.prompt = dedent("""\
         Audio Transcription Guidelines
 
         Your task is to transcribe the provided audio accurately. Whether the audio contains normal speech or technical content with varied speeds, please adhere to the following guidelines:
@@ -240,19 +238,17 @@ class GeminiTranscriber(AudioTranscriber):
 
         6. For technical content, preserve technical terms, acronyms, and specialized vocabulary exactly as spoken.
 
-        Ready to begin transcription when you provide the audio.""")
+        7. Remove any ums and uhs. Connect their thought so that it is fluid.
 
-        self.postprocessing_prompt = dedent("""\
-        Post-processing Guidelines
-
-        1. Remove any ums and uhs. Connect their thought so that it is fluid.
-
-        2. The user may have self-edited while speaking. If the user corrects themselves (usually via some interjection like "I meant" or "no, no"), edit the transcription to reflect their intended meaning rather than including the correction process itself.
+        8. The user may have self-edited while speaking. If the user corrects themselves (usually via some interjection like "I meant" or "no, no"), edit the transcription to reflect their intended meaning rather than including the correction process itself.
 
         <EXAMPLE>
         User Said: "The art of doing science and engineering. I mean just science."
         Expected Transcription: "The art of doing science."
-        </EXAMPLE>""")
+        </EXAMPLE>
+
+        Below will follow the audio.
+        """)
 
     @staticmethod
     def create(*args, **kwargs):
@@ -279,12 +275,11 @@ class GeminiTranscriber(AudioTranscriber):
             response = self.client.models.generate_content(
                 model=self.model_name,
                 contents=[
-                    self.transcription_prompt,
+                    self.prompt,
                     types.Part.from_bytes(
                         data=audio_bytes,
                         mime_type='audio/wav',
                     ),
-                    self.postprocessing_prompt,
                 ]
             )
 

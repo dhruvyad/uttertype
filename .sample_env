@@ -26,6 +26,4 @@ OPENAI_MODEL_NAME="whisper-1"
 # GEMINI_MODEL_NAME="gemini-2.0-flash"
 
 # UTTERTYPE_RECORD_HOTKEYS="<ctrl>+<alt>+v" # defaults to <globe> on Mac, <ctrl>+<alt>+v otherwise
-
-# Minimum duration of speech to send to API between gaps of silence
-# UTTERTYPE_MIN_TRANSCRIPTION_SIZE_MS=<time-in-ms> # defaults to: 5000
+# See https://pynput.readthedocs.io/en/latest/keyboard.html#global-hotkeys for other options
