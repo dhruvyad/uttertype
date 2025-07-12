@@ -124,5 +124,27 @@ OR
 
 When the program first runs, you will likely need to give it sufficient permissions. On macOS, this will include adding terminal to accessibility under `Privacy and Security > Accessibility`, giving it permission to monitor the keyboard, and finally giving it permission to record using the microphone.
 
+## Language Support
+
+uttertype now supports dual language speech recognition with dedicated hotkeys for each language!
+
+### Configuration
+Add language settings to your `.env` file:
+
+```env
+# Language configuration
+UTTERTYPE_LANGUAGE=en                    # Primary language
+UTTERTYPE_SECOND_LANGUAGE=ru             # Secondary language
+
+# Hotkey configuration
+UTTERTYPE_RECORD_HOTKEYS=<ctrl>+<alt>+v              # Primary language hotkey
+UTTERTYPE_RECORD_HOTKEYS_SECOND_LANGUAGE=<ctrl>+<alt>+r    # Secondary language hotkey
+```
+
+### Usage
+- **Primary Language**: Hold your primary hotkey (default: `Ctrl+Alt+V`) and speak in your primary language
+- **Secondary Language**: Hold your secondary hotkey (default: `Ctrl+Alt+R`) and speak in your secondary language
+- The console will show which language was used for each transcription with language code prefix
+
+
 ## Usage
-To start transcription, press and hold the registered hotkey to start recording. To stop the recording, lift your registered hotkey. On macOS, the registered hotkey is the globe icon by default. For other operating systems, this will have to by manually configured in `main.py` as described earlier.

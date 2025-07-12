@@ -47,19 +47,56 @@ class HoldGlobeKey:
         self.press(key)
 
 
-def create_keylistener(transcriber, env_var="UTTERTYPE_RECORD_HOTKEYS"):
-    key_code = os.getenv(env_var, "")
+class MultiHotKeyListener:
+    """Handles multiple hotkeys for different functions"""
+    def __init__(self, transcriber):
+        self.transcriber = transcriber
+        self.hotkeys = []
+        self._setup_hotkeys()
 
-    if (sys.platform == "darwin") and (key_code in ["<globe>", ""]):
-        return HoldGlobeKey(
-            on_activate=transcriber.start_recording,
-            on_deactivate=transcriber.stop_recording,
+    def _setup_hotkeys(self):
+        # Get language configuration
+        primary_lang = os.getenv("UTTERTYPE_LANGUAGE", "en")
+        secondary_lang = os.getenv("UTTERTYPE_SECOND_LANGUAGE", "ru")
+        
+        # Primary language recording hotkey
+        primary_key = os.getenv("UTTERTYPE_RECORD_HOTKEYS", "<ctrl>+<alt>+v")
+        if (sys.platform == "darwin") and (primary_key in ["<globe>", ""]):
+            primary_hotkey = HoldGlobeKey(
+                on_activate=lambda: self._start_recording(primary_lang),
+                on_deactivate=self.transcriber.stop_recording,
+            )
+        else:
+            primary_hotkey = HoldHotKey(
+                HoldHotKey.parse(primary_key),
+                on_activate=lambda: self._start_recording(primary_lang),
+                on_deactivate=self.transcriber.stop_recording,
+            )
+        self.hotkeys.append(primary_hotkey)
+
+        # Secondary language recording hotkey
+        secondary_key = os.getenv("UTTERTYPE_RECORD_HOTKEYS_SECOND_LANGUAGE", "<ctrl>+<alt>+r")
+        secondary_hotkey = HoldHotKey(
+            HoldHotKey.parse(secondary_key),
+            on_activate=lambda: self._start_recording(secondary_lang),
+            on_deactivate=self.transcriber.stop_recording,
         )
+        self.hotkeys.append(secondary_hotkey)
 
-    key_code = key_code if key_code else "<ctrl>+<alt>+v"
+    def _start_recording(self, language):
+        """Start recording with specified language"""
+        self.transcriber.set_language(language)
+        self.transcriber.start_recording()
 
-    return HoldHotKey(
-          HoldHotKey.parse(key_code),
-          on_activate=transcriber.start_recording,
-          on_deactivate=transcriber.stop_recording,
-      )
+    def press(self, key):
+        for hotkey in self.hotkeys:
+            hotkey.press(key)
+
+    def release(self, key):
+        for hotkey in self.hotkeys:
+            hotkey.release(key)
+
+
+def create_keylistener(transcriber, env_var="UTTERTYPE_RECORD_HOTKEYS"):
+    """Create a multi-hotkey listener for recording and language toggle"""
+    return MultiHotKeyListener(transcriber)
