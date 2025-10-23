@@ -32,6 +32,7 @@ class AudioTranscriber:
         self.event_loop = asyncio.get_event_loop()
         self.vad = webrtcvad.Vad(1)  # Voice Activity Detector, mode can be 0 to 3
         self.transcriptions = asyncio.Queue()
+        self.language = "en"  # Default language is English
 
     def start_recording(self):
         """Start recording audio from the microphone."""
@@ -116,6 +117,14 @@ class AudioTranscriber:
         wf.close()
         return buffer
 
+    def set_language(self, language: str):
+        """Set the transcription language"""
+        self.language = language
+
+    def get_language(self) -> str:
+        """Get current language"""
+        return self.language
+
     def transcribe_audio(self, audio: io.BytesIO) -> str:
         raise NotImplementedError("Please use a subclass of AudioTranscriber")
 
@@ -146,12 +155,15 @@ class WhisperAPITranscriber(AudioTranscriber):
 
     def transcribe_audio(self, audio: io.BytesIO) -> str:
         try:
+            # Use default prompt for technical speech
+            prompt = "The following is normal speech or technical speech from an engineer."
+            
             transcription = self.client.audio.transcriptions.create(
                 model=self.model_name,
                 file=audio,
                 response_format="text",
-                language="en",
-                prompt="The following is normal speech or technical speech from an engineer.",
+                language=self.language,
+                prompt=prompt,
             )
             return transcription
         except Exception as e:
